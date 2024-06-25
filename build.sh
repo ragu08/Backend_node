@@ -28,7 +28,7 @@ mkdir "$buildFolder"
 cp package*.json "$buildFolder/"
 
 # Copy firebase.*.json file to the build directory
-cp firebase*.json "$buildFolder/"
+#cp firebase*.json "$buildFolder/"
 
 # Copy dist directory to the build directory
 cp -r dist/ "$buildFolder/"
