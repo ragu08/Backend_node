@@ -20,7 +20,7 @@ WORKDIR /home/node/app
 # where available (npm@5+)
 COPY --chown=node build/ ./
 COPY --chown=node package*.json ./
-COPY --chown=node pm2.config.js ./
+#COPY --chown=node pm2.config.js ./
 
 # Bind to all network interfaces so that it can be mapped to the host OS
 ENV HOST=0.0.0.0 PORT=3000
