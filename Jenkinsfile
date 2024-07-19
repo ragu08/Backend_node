@@ -4,7 +4,7 @@ pipeline {
     tools {
         nodejs "node"
     }
-    
+
     environment {
         APP_NAME = 'mws-dconag-api-jenkins-demo'
         VERSION_NAME="1.0.0"
@@ -12,6 +12,42 @@ pipeline {
     }
 
     stages {
+        stage('Checkout') {
+            parallel {
+                stage('Checkout Development Branch') {
+                    agent { label 'jenkins' }
+                    when {
+                        branch 'development'
+                    }
+                    steps {
+                        checkout([
+                            $class: 'GitSCM',
+                            branches: [[name: 'refs/heads/develop']],
+                            userRemoteConfigs: [[
+                            url: 'https://github.com/ragu08/Backend_node.git',
+                            credentialsId: 'github'
+                        ]]
+                        ])
+                    }
+                }
+                stage('Checkout Release Branch') {
+                    agent { label 'stage' }
+                    when {
+                        branch 'release'
+                    }
+                    steps {
+                        checkout([
+                            $class: 'GitSCM',
+                            branches: [[name: 'refs/heads/release']],
+                            userRemoteConfigs: [[
+                            url: 'https://github.com/ragu08/Backend_node.git',
+                            credentialsId: 'github'
+                        ]]
+                        ])
+                    }
+                }
+            }
+        }
         stage('Retrieve Config File - Development') {
             when {
                 branch 'development'
@@ -23,7 +59,7 @@ pipeline {
                 script {
                     // Get the workspace directory
                     def workspaceDir = pwd()
-                    
+
                     // Retrieve the managed config file and place it in the workspace
                     configFileProvider([configFile(fileId: 'firebase.development.json', targetLocation: "${workspaceDir}/firebase.development.json")]) {
                     }
@@ -41,7 +77,7 @@ pipeline {
                 script {
                     // Get the workspace directory
                     def workspaceDir = pwd()
-                    
+
                     // Retrieve the managed config file and place it in the workspace
                     configFileProvider([configFile(fileId: 'firebase.production.json', targetLocation: "${workspaceDir}/firebase.production.json")]) {
                     }
