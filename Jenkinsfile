@@ -19,7 +19,7 @@ pipeline {
                     def workspaceDir = pwd()
                     
                     // Retrieve the managed config file and place it in the workspace
-                    configFileProvider([configFile(fileId: 'firebase.production.json', targetLocation: "${workspaceDir}/firebase.production.json")]) {
+                    configFileProvider([configFile(fileId: 'firebase.development.json', targetLocation: "${workspaceDir}/firebase.development.json")]) {
                     }
                 }
             }
