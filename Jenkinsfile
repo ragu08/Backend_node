@@ -1,14 +1,17 @@
 pipeline {
-    agent none  // Define a top-level agent as none, since you'll specify agents for each stage
-    
+    agent none
+
     tools {
         nodejs "node"
     }
 
     stages {
         stage('Retrieve Config File - Development') {
+            when {
+                branch 'development'
+            }
             agent {
-                label 'development'
+                label 'jenkins'
             }
             steps {
                 script {
@@ -22,6 +25,9 @@ pipeline {
             }
         }
         stage('Retrieve Config File - Stage') {
+            when {
+                branch 'release'
+            }
             agent {
                 label 'stage'
             }
