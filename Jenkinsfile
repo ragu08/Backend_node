@@ -6,25 +6,24 @@ pipeline {
     }
 
     environment {
-        APP_NAME = 'mws-dconag-api-jenkins-demo'
+        APP_NAME = 'mws-multistage-sample'
         VERSION_NAME="1.0.0"
         BUILD_NUMBER = "${env.BUILD_NUMBER}"
+        dockerHubRepo = 'stage-registry.dconag.com'
     }
 
     stages {
         stage('Checkout') {
             parallel {
                 stage('Checkout Development Branch') {
+                    agent { label 'jenkins' }
                     when {
                         branch 'development'
-                    }
-                    agent {
-                        label 'jenkins'
                     }
                     steps {
                         checkout([
                             $class: 'GitSCM',
-                            branches: [[name: 'refs/heads/development']],
+                            branches: [[name: 'refs/heads/develop']],
                             userRemoteConfigs: [[
                             url: 'https://github.com/ragu08/Backend_node.git',
                             credentialsId: 'github'
@@ -33,11 +32,9 @@ pipeline {
                     }
                 }
                 stage('Checkout Release Branch') {
+                    agent { label 'stage' }
                     when {
                         branch 'release'
-                    }
-                    agent {
-                        label 'stage'
                     }
                     steps {
                         checkout([
@@ -115,6 +112,36 @@ pipeline {
                     // Ensure the build script is executable and run it
                     sh 'chmod +x build.sh'
                     sh './build.sh'
+                }
+            }
+        }
+        stage('Push Image to Private Registry') {
+            when {
+                branch 'development'
+            }
+            agent {
+                label 'development'
+            }
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: 'dockerprivateregistry', url: 'https://stage-registry.dconag.com') {
+                        sh 'docker push ${dockerHubRepo}/${APP_NAME}:${VERSION_NAME}.${BUILD_NUMBER}'
+                    }
+                }
+            }
+        }
+        stage('Push Image to Private Registry') {
+            when {
+                branch 'release'
+            }
+            agent {
+                label 'stage'
+            }
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: 'dockerprivateregistry', url: 'https://stage-registry.dconag.com') {
+                        sh 'docker push ${dockerHubRepo}/${APP_NAME}:${VERSION_NAME}.${BUILD_NUMBER}'
+                    }
                 }
             }
         }
