@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Retrieve Config File - Development') {
             agent {
-                label 'development'
+                label 'jenkins'
             }
             steps {
                 script {
