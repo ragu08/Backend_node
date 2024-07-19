@@ -115,7 +115,7 @@ pipeline {
                 }
             }
         }
-        stage('Push Image to Private Registry') {
+        stage('Push Image to Private Registry - Development') {
             when {
                 branch 'development'
             }
@@ -130,7 +130,7 @@ pipeline {
                 }
             }
         }
-        stage('Push Image to Private Registry') {
+        stage('Push Image to Private Registry - Stage') {
             when {
                 branch 'release'
             }
