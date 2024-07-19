@@ -42,5 +42,35 @@ pipeline {
                 }
             }
         }
+        stage('Run Build Script - Development') {
+            when {
+                branch 'development'
+            }
+            agent {
+                label 'jenkins'
+            }
+            steps {
+                script {
+                    // Ensure the build script is executable and run it
+                    sh 'chmod +x build.sh'
+                    sh './build.sh'
+                }
+            }
+        }
+        stage('Run Build Script - Stage') {
+            when {
+                branch 'release'
+            }
+            agent {
+                label 'stage'
+            }
+            steps {
+                script {
+                    // Ensure the build script is executable and run it
+                    sh 'chmod +x build.sh'
+                    sh './build.sh'
+                }
+            }
+        }
     }
 }
