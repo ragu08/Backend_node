@@ -120,7 +120,7 @@ pipeline {
                 branch 'development'
             }
             agent {
-                label 'development'
+                label 'jenkins'
             }
             steps {
                 script {
