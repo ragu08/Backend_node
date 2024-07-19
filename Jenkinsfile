@@ -1,12 +1,15 @@
 pipeline {
     agent none
-    
+
     tools {
         nodejs "node"
     }
 
     stages {
         stage('Retrieve Config File - Development') {
+            when {
+                branch 'development'
+            }
             agent {
                 label 'jenkins'
             }
@@ -16,12 +19,15 @@ pipeline {
                     def workspaceDir = pwd()
                     
                     // Retrieve the managed config file and place it in the workspace
-                    configFileProvider([configFile(fileId: 'firebase.production.json', targetLocation: "${workspaceDir}/firebase.production.json")]) {
+                    configFileProvider([configFile(fileId: 'firebase.development.json', targetLocation: "${workspaceDir}/firebase.development.json")]) {
                     }
                 }
             }
         }
         stage('Retrieve Config File - Stage') {
+            when {
+                branch 'release'
+            }
             agent {
                 label 'stage'
             }
