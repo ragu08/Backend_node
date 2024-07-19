@@ -23,7 +23,7 @@ pipeline {
                     steps {
                         checkout([
                             $class: 'GitSCM',
-                            branches: [[name: 'refs/heads/develop']],
+                            branches: [[name: 'refs/heads/development']],
                             userRemoteConfigs: [[
                             url: 'https://github.com/ragu08/Backend_node.git',
                             credentialsId: 'github'
