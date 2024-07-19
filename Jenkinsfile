@@ -15,14 +15,16 @@ pipeline {
         stage('Checkout') {
             parallel {
                 stage('Checkout Development Branch') {
-                    agent { label 'jenkins' }
                     when {
                         branch 'development'
+                    }
+                    agent {
+                        label 'jenkins'
                     }
                     steps {
                         checkout([
                             $class: 'GitSCM',
-                            branches: [[name: 'refs/heads/develop']],
+                            branches: [[name: 'refs/heads/development']],
                             userRemoteConfigs: [[
                             url: 'https://github.com/ragu08/Backend_node.git',
                             credentialsId: 'github'
@@ -31,9 +33,11 @@ pipeline {
                     }
                 }
                 stage('Checkout Release Branch') {
-                    agent { label 'stage' }
                     when {
                         branch 'release'
+                    }
+                    agent {
+                        label 'stage'
                     }
                     steps {
                         checkout([
