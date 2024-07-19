@@ -4,6 +4,12 @@ pipeline {
     tools {
         nodejs "node"
     }
+    
+    environment {
+        APP_NAME = 'mws-dconag-api-jenkins-demo'
+        VERSION_NAME="1.0.0"
+        BUILD_NUMBER = "${env.BUILD_NUMBER}"
+    }
 
     stages {
         stage('Retrieve Config File - Development') {
