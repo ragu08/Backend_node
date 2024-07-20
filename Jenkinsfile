@@ -195,9 +195,7 @@ pipeline {
                     """
 
                     // Pull the image from the private registry
-                    withDockerRegistry(credentialsId: dockerprivateregistry, url: 'https://stage-registry.dconag.com') {
-                        sh "docker pull ${DOCKERHUB_REPO}/${APP_NAME}:${VERSION_NAME}.${BUILD_NUMBER}"
-                    }
+                    sh "docker pull ${DOCKERHUB_REPO}/${APP_NAME}:${VERSION_NAME}.${BUILD_NUMBER}"
 
                     // Start the new container
                     def dockerRunCommand = "docker run --name ${APP_NAME} --hostname dconag_api --network=sample --ip 172.18.0.3 -p 7101:3000 --env-file ./.env.development --restart=always -d ${DOCKERHUB_REPO}/${APP_NAME}:${VERSION_NAME}.${BUILD_NUMBER}"
