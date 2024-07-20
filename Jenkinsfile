@@ -195,7 +195,7 @@ pipeline {
                     """
 
                     // Pull the image from the private registry
-                    withDockerRegistry(credentialsId: PRIVATE_REGISTRY_CREDENTIALS, url: PRIVATE_REGISTRY_URL) {
+                    withDockerRegistry(credentialsId: dockerprivateregistry, url: 'https://stage-registry.dconag.com') {
                         sh "docker pull ${DOCKERHUB_REPO}/${APP_NAME}:${VERSION_NAME}.${BUILD_NUMBER}"
                     }
 
