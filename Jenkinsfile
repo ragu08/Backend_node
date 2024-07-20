@@ -23,7 +23,7 @@ pipeline {
                     steps {
                         checkout([
                             $class: 'GitSCM',
-                            branches: [[name: 'refs/heads/development']],
+                            branches: [[name: 'development']],
                             userRemoteConfigs: [[
                             url: 'https://github.com/ragu08/Backend_node.git',
                             credentialsId: 'github'
@@ -39,7 +39,7 @@ pipeline {
                     steps {
                         checkout([
                             $class: 'GitSCM',
-                            branches: [[name: 'refs/heads/release']],
+                            branches: [[name: 'release']],
                             userRemoteConfigs: [[
                             url: 'https://github.com/ragu08/Backend_node.git',
                             credentialsId: 'github'
@@ -112,6 +112,32 @@ pipeline {
                     // Ensure the build script is executable and run it
                     sh 'chmod +x build.sh'
                     sh './build.sh'
+                }
+            }
+        }
+        stage('Build Docker Image - Development') {
+            when {
+                branch 'development'
+            }
+            agent {
+                label 'jenkins'
+            }
+            steps {
+                script {
+                    sh "docker build -t ${dockerHubRepo}/${APP_NAME}:${VERSION_NAME}.${BUILD_NUMBER} ."
+                }
+            }
+        }
+        stage('Build Docker Image - Stage') {
+            when {
+                branch 'release'
+            }
+            agent {
+                label 'stage'
+            }
+            steps {
+                script {
+                    sh "docker build -t ${dockerHubRepo}/${APP_NAME}:${VERSION_NAME}.${BUILD_NUMBER} ."
                 }
             }
         }
