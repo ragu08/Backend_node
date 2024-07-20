@@ -61,8 +61,12 @@ pipeline {
                     // Get the workspace directory
                     def workspaceDir = pwd()
 
-                    // Retrieve the managed config file and place it in the workspace
+                    // Retrieve the FireBase File and place it in the workspace
                     configFileProvider([configFile(fileId: 'firebase.development.json', targetLocation: "${workspaceDir}/firebase.development.json")]) {
+                    }
+
+                    // Retrieve the Environment File and plae it in the workspace
+                    configFileProvider([configFile(fileId: '.env.development', targetLocation: "${workspaceDir}/.env.development")]) {
                     }
                 }
             }
@@ -79,8 +83,12 @@ pipeline {
                     // Get the workspace directory
                     def workspaceDir = pwd()
 
-                    // Retrieve the managed config file and place it in the workspace
-                    configFileProvider([configFile(fileId: 'firebase.production.json', targetLocation: "${workspaceDir}/firebase.production.json")]) {
+                    // Retrieve the FireBase File and place it in the workspace
+                    configFileProvider([configFile(fileId: 'firebase.development.json', targetLocation: "${workspaceDir}/firebase.development.json")]) {
+                    }
+
+                    // Retrieve the Environment File and plae it in the workspace
+                    configFileProvider([configFile(fileId: '.env.development', targetLocation: "${workspaceDir}/.env.development")]) {
                     }
                 }
             }
@@ -168,6 +176,32 @@ pipeline {
                     withDockerRegistry(credentialsId: 'dockerprivateregistry', url: 'https://stage-registry.dconag.com') {
                         sh 'docker push ${dockerHubRepo}/${APP_NAME}:${VERSION_NAME}.${BUILD_NUMBER}'
                     }
+                }
+            }
+        }
+        stage('Deploy to Development Server') {
+            when {
+                branch 'development'
+            }
+            agent {
+                label 'jenkins'
+            }
+            steps {
+                script {
+                    // Stop and remove any existing container
+                    sh """
+                    docker stop ${APP_NAME} || true
+                    docker rm ${APP_NAME} || true
+                    """
+
+                    // Pull the image from the private registry
+                    withDockerRegistry(credentialsId: PRIVATE_REGISTRY_CREDENTIALS, url: PRIVATE_REGISTRY_URL) {
+                        sh "docker pull ${DOCKERHUB_REPO}/${APP_NAME}:${VERSION_NAME}.${BUILD_NUMBER}"
+                    }
+
+                    // Start the new container
+                    def dockerRunCommand = "docker run --name ${APP_NAME} --hostname dconag_api --network=sample --ip 172.18.0.3 -p 7101:3000 --env-file ./.env.development --restart=always -d ${DOCKERHUB_REPO}/${APP_NAME}:${VERSION_NAME}.${BUILD_NUMBER}"
+                    sh dockerRunCommand
                 }
             }
         }
